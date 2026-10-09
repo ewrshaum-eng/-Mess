@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#123c35">
+<link rel="manifest" href="manifest.json">
+<title>Jom Jom Mess</title>
+<style>
+:root{--green:#123c35;--mint:#dff5e9;--gold:#f3c969;--bg:#f4f7f5;--ink:#172521;--muted:#687873;--white:#fff;--red:#b83a3a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif}
+header{background:linear-gradient(135deg,#123c35,#1b6554);color:white;padding:24px 18px 26px;border-radius:0 0 26px 26px}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:48px;height:48px;border-radius:16px;background:#ffffff20;display:grid;place-items:center;font-size:26px}
+h1{font-size:22px;margin:0}header p{margin:5px 0 0;color:#d9eee6;font-size:13px}
+main{max-width:720px;margin:auto;padding:16px 14px 90px}.row{display:flex;gap:10px;align-items:center;justify-content:space-between}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.card{background:white;border:1px solid #e4ebe7;border-radius:18px;padding:15px;box-shadow:0 4px 16px #163e3010;margin-bottom:12px}
+.stat strong{display:block;font-size:23px;margin-top:8px}.stat span,.muted{font-size:12px;color:var(--muted)}
+h2{font-size:17px;margin:5px 0 12px}.pill{font-size:11px;padding:5px 9px;border-radius:999px;background:var(--mint);color:var(--green);font-weight:700}
+button,input,select{font:inherit}button{border:0;border-radius:12px;padding:11px 13px;font-weight:700;cursor:pointer;background:var(--green);color:white}
+button.secondary{background:#eaf0ed;color:var(--green)}button.red{background:#fff0f0;color:var(--red)}button:disabled{opacity:.45}
+nav{position:fixed;bottom:0;left:0;right:0;background:#ffffffed;backdrop-filter:blur(12px);border-top:1px solid #dfe8e3;display:flex;justify-content:space-around;padding:8px 4px max(8px,env(safe-area-inset-bottom));z-index:5}
+nav button{background:transparent;color:var(--muted);padding:7px 8px;font-size:11px;display:grid;gap:3px;justify-items:center}nav button.active{color:var(--green);background:var(--mint)}nav b{font-size:18px}
+label{font-size:12px;color:var(--muted);display:block;margin:10px 0 5px}input,select{width:100%;padding:11px;border:1px solid #dbe5df;border-radius:11px;background:white;color:var(--ink)}
+.item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #edf1ee;gap:10px}.item:last-child{border-bottom:0}
+.switch{min-width:76px}.on{background:#dff5e9;color:#12613f}.off{background:#fff0f0;color:#b83a3a}
+.notice{padding:11px;border-radius:12px;background:#fff8df;color:#755714;font-size:12px;line-height:1.5}
+.hidden{display:none!important}.small{font-size:12px}.titleline{display:flex;justify-content:space-between;align-items:center;margin:8px 2px 12px}
+footer{text-align:center;color:#8a9891;font-size:11px;padding:12px}
+@media(min-width:560px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header><div class="brand"><div class="logo">🍚</div><div><h1>Jom Jom Mess</h1><p>এক মেস, এক হিসাব, সবার জন্য</p></div></div></header>
+<main>
+<section id="home">
+ <div class="titleline"><h2>আজকের ড্যাশবোর্ড</h2><span class="pill" id="rolePill">Member Mode</span></div>
+ <div class="grid">
+  <div class="card stat"><span>আজকের সক্রিয় মিল</span><strong id="totalMeals">0</strong></div>
+  <div class="card stat"><span>এই মাসের বাজার</span><strong id="totalCost">৳0</strong></div>
+  <div class="card stat"><span>সদস্য</span><strong id="membersCount">1</strong></div>
+  <div class="card stat"><span>আমার জমা</span><strong id="myDeposit">৳0</strong></div>
+ </div>
+ <div class="card"><div class="row"><h2>আজকের মেনু</h2><span class="muted" id="todayDate"></span></div><div id="menuSummary"></div></div>
+ <div class="notice">ডেমো সংস্করণ: এই মুহূর্তে তথ্য এই ফোনের ব্রাউজারে সেভ হয়। সব সদস্যের ফোনে একই তথ্য দেখাতে Firebase/অনলাইন ডেটাবেস সংযোগ করতে হবে।</div>
+</section>
+<section id="meals" class="hidden">
+ <div class="titleline"><h2>আমার Meal</h2><span class="pill">ডিফল্ট ON</span></div>
+ <div class="card"><p class="muted">খাবার না খেলে শুধু OFF করো। নির্ধারিত সময় পেরোলে পরিবর্তন বন্ধ হবে।</p><div id="mealControls"></div></div>
+ <div class="card"><h2>Admin-এর নির্ধারিত শেষ সময়</h2><div id="deadlineSummary" class="muted">এখনো সময় নির্ধারণ করা হয়নি</div></div>
+</section>
+<section id="market" class="hidden">
+ <div class="titleline"><h2>বাজার ও খরচ</h2><span class="pill">খরচের তালিকা</span></div>
+ <div id="adminMarketForm" class="card hidden"><h2>নতুন খরচ যোগ</h2><label>পণ্যের নাম</label><input id="expenseName" placeholder="যেমন: চাল, ডাল, সবজি"><label>পরিমাণ / বিবরণ</label><input id="expenseQty" placeholder="যেমন: ৫ কেজি"><label>টাকা (৳)</label><input id="expenseAmount" type="number" min="0" placeholder="250"><label>কে বাজার করেছে</label><input id="expenseBuyer" placeholder="সদস্যের নাম"><button style="width:100%;margin-top:12px" onclick="addExpense()">খরচ সেভ করো</button></div>
+ <div class="card"><h2>বাজারের হিসাব</h2><div id="expenseList"></div></div>
+</section>
+<section id="accounts" class="hidden">
+ <div class="titleline"><h2>হিসাব ও সদস্য</h2><span class="pill">মাসিক হিসাব</span></div>
+ <div class="card"><h2>আমার টাকা</h2><div class="item"><span>জমা</span><strong id="depositValue">৳0</strong></div><div class="item"><span>আমার Meal</span><strong id="myMealCount">0</strong></div><div class="item"><span>বাজারের মোট খরচ</span><strong id="accountExpenseTotal">৳0</strong></div></div>
+ <div class="card" id="adminMemberForm"><h2>সদস্যের জমা (ডেমো)</h2><p class="muted">শুধু Admin Mode-এ দেখা যাবে।</p><label>সদস্যের নাম</label><input id="memberName" placeholder="সদস্যের নাম"><label>জমা টাকা</label><input id="memberDeposit" type="number" min="0" placeholder="1000"><button style="width:100%;margin-top:12px" onclick="saveMember()">সদস্য/জমা সেভ করো</button><div id="membersList"></div></div>
+</section>
+<section id="admin" class="hidden">
+ <div class="titleline"><h2>Admin Panel</h2><span class="pill">সর্বোচ্চ ২ জন</span></div>
+ <div class="card"><h2>ডেমো Role পরিবর্তন</h2><div class="notice">এটি শুধু UI পরীক্ষা করার জন্য। বাস্তব অ্যাপে Admin নির্বাচন সার্ভার/ডেটাবেসের নিরাপদ অনুমতি দিয়ে করতে হবে; সাধারণ সদস্যকে এই ডেমো সুইচ দেওয়া যাবে না।</div><label>এই ফোনে অ্যাপটি কীভাবে দেখাবে?</label><select id="roleSelect" onchange="setRole(this.value)"><option value="member">Member</option><option value="admin">Admin (ডেমো)</option></select><label>বর্তমান Admin</label><input id="adminName" value="বর্তমান Admin"><label>পরবর্তী Admin নির্বাচন (ডেমো)</label><select id="nextAdmin"><option value="">সদস্য নির্বাচন</option></select><button style="width:100%;margin-top:12px" onclick="chooseNextAdmin()">পরবর্তী Admin নির্বাচন</button><p class="muted">বাস্তব সিস্টেমে মাসের শুরুতে Role পরিবর্তন ও সর্বোচ্চ ২ Admin সীমা নিরাপদভাবে যাচাই করতে হবে।</p></div>
+ <div class="card"><h2>Meal Menu পরিবর্তন</h2><label>সকালের খাবার</label><input id="menuBreakfast" value="ভাত, ডাল, সবজি"><label>দুপুরের খাবার</label><input id="menuLunch" value="ভাত, ডাল, সবজি"><label>রাতের খাবার</label><input id="menuDinner" value="ভাত, ডাল, সবজি"><button style="width:100%;margin-top:12px" onclick="saveMenu()">মেনু সেভ করো</button></div>
+ <div class="card"><h2>Meal OFF-এর শেষ সময়</h2><p class="muted">প্রতিটি বেলার জন্য সময় সেট করো।</p><label>সকালের Meal</label><input id="deadlineBreakfast" type="time" value="07:00"><label>দুপুরের Meal</label><input id="deadlineLunch" type="time" value="10:00"><label>রাতের Meal</label><input id="deadlineDinner" type="time" value="17:00"><button style="width:100%;margin-top:12px" onclick="saveDeadlines()">শেষ সময় সেভ করো</button></div>
+ <div class="card"><h2>ডেটা</h2><button class="secondary" onclick="exportData()">ডেমো ডেটা ডাউনলোড</button> <button class="red" onclick="resetDemo()">ডেমো রিসেট</button></div>
+</section>
+<footer>Jom Jom Mess • Starter Demo</footer>
+</main>
+<nav>
+<button class="active" data-page="home" onclick="showPage('home',this)"><b>⌂</b>হোম</button>
+<button data-page="meals" onclick="showPage('meals',this)"><b>🍚</b>Meal</button>
+<button data-page="market" onclick="showPage('market',this)"><b>🛒</b>বাজার</button>
+<button data-page="accounts" onclick="showPage('accounts',this)"><b>৳</b>হিসাব</button>
+<button data-page="admin" onclick="showPage('admin',this)"><b>⚙</b>Admin</button>
+</nav>
+<script>
+const KEY='jomjom-demo-v1';
+const today=new Date(); const dateKey=today.toISOString().slice(0,10);
+const defaults=()=>({role:'member',meals:{},menu:{breakfast:'ভাত, ডাল, সবজি',lunch:'ভাত, ডাল, সবজি',dinner:'ভাত, ডাল, সবজি'},deadlines:{breakfast:'07:00',lunch:'10:00',dinner:'17:00'},expenses:[],members:[{name:'Demo Member',deposit:0}],nextAdmin:'',adminName:'বর্তমান Admin'});
+let data;try{data=JSON.parse(localStorage.getItem(KEY))||defaults()}catch(e){data=defaults()}
+function save(){localStorage.setItem(KEY,JSON.stringify(data));render()}
+function money(n){return '৳'+Number(n||0).toLocaleString('en-US')}
+function dateNow(){return new Date().toLocaleDateString('bn-BD',{day:'numeric',month:'short'})}
+document.getElementById('todayDate').textContent=dateNow();
+function dayMealKey(meal){return dateKey+'_'+meal}
+function mealOn(meal){if(data.meals[dayMealKey(meal)]===undefined)return true;return data.meals[dayMealKey(meal)]}
+function deadlinePassed(meal){const t=data.deadlines[meal];if(!t)return false;const now=new Date();const [h,m]=t.split(':').map(Number);return now.getHours()*60+now.getMinutes()>h*60+m}
+function showPage(id,btn){document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');render()}
+function setRole(v){data.role=v;save()}
+function saveMenu(){data.menu={breakfast:document.getElementById('menuBreakfast').value||'নির্ধারিত নয়',lunch:document.getElementById('menuLunch').value||'নির্ধারিত নয়',dinner:document.getElementById('menuDinner').value||'নির্ধারিত নয়'};save();alert('ডেমোতে মেনু সেভ হয়েছে।')}
+function saveDeadlines(){data.deadlines={breakfast:document.getElementById('deadlineBreakfast').value,lunch:document.getElementById('deadlineLunch').value,dinner:document.getElementById('deadlineDinner').value};save();alert('ডেমোতে শেষ সময় সেভ হয়েছে।')}
+function addExpense(){const name=document.getElementById('expenseName').value.trim(),amount=Number(document.getElementById('expenseAmount').value);if(!name||!Number.isFinite(amount)||amount<=0){alert('পণ্যের নাম ও সঠিক টাকা দাও।');return}data.expenses.unshift({name,qty:document.getElementById('expenseQty').value,buyer:document.getElementById('expenseBuyer').value,amount,date:dateKey});['expenseName','expenseQty','expenseAmount','expenseBuyer'].forEach(id=>document.getElementById(id).value='');save();alert('ডেমো খরচ সেভ হয়েছে।')}
+function saveMember(){const name=document.getElementById('memberName').value.trim(),deposit=Number(document.getElementById('memberDeposit').value);if(!name||deposit<0){alert('সদস্যের নাম ও জমার টাকা দাও।');return}const old=data.members.find(m=>m.name===name);if(old)old.deposit+=deposit;else data.members.push({name,deposit});document.getElementById('memberName').value='';document.getElementById('memberDeposit').value='';save();alert('ডেমো সদস্য সেভ হয়েছে।')}
+function chooseNextAdmin(){const name=document.getElementById('nextAdmin').value;if(!name){alert('একজন সদস্য নির্বাচন করো।');return}data.nextAdmin=name;save();alert(name+'-কে পরবর্তী Admin হিসেবে ডেমোতে নির্বাচন করা হয়েছে। বাস্তব Role এখনো বদলায়নি।')}
+function exportData(){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='jom-jom-demo-data.json';a.click();URL.revokeObjectURL(a.href)}
+function resetDemo(){if(confirm('এই ফোনের ডেমো ডেটা মুছবে?')){data=defaults();save()}}
+function render(){
+const isAdmin=data.role==='admin';document.getElementById('rolePill').textContent=isAdmin?'Admin Mode':'Member Mode';
+document.getElementById('totalMeals').textContent=['breakfast','lunch','dinner'].filter(mealOn).length;
+document.getElementById('totalCost').textContent=money(data.expenses.reduce((s,e)=>s+e.amount,0));
+document.getElementById('membersCount').textContent=data.members.length;
+document.getElementById('myDeposit').textContent=money(data.members[0]?.deposit||0);
+document.getElementById('menuSummary').innerHTML=[['সকাল',data.menu.breakfast],['দুপুর',data.menu.lunch],['রাত',data.menu.dinner]].map(x=>`<div class="item"><span>${x[0]}</span><strong>${esc(x[1])}</strong></div>`).join('');
+document.getElementById('mealControls').innerHTML=[['breakfast','সকালের খাবার'],['lunch','দুপুরের খাবার'],['dinner','রাতের খাবার']].map(([id,n])=>`<div class="item"><div><strong>${n}</strong><div class="muted">${mealOn(id)?'Meal ON':'Meal OFF'} ${deadlinePassed(id)?'· সময় শেষ':''}</div></div><button class="switch ${mealOn(id)?'on':'off'}" ${deadlinePassed(id)?'disabled':''} onclick="toggleMeal('${id}')">${mealOn(id)?'OFF করুন':'ON করুন'}</button></div>`).join('');
+document.getElementById('deadlineSummary').textContent=[['সকাল',data.deadlines.breakfast],['দুপুর',data.deadlines.lunch],['রাত',data.deadlines.dinner]].map(x=>x[0]+': '+(x[1]||'নির্ধারিত নয়')).join(' · ');
+document.getElementById('expenseList').innerHTML=data.expenses.length?data.expenses.map(e=>`<div class="item"><div><strong>${esc(e.name)}</strong><div class="muted">${esc(e.qty||'')} · ${esc(e.buyer||'')} · ${e.date}</div></div><strong>${money(e.amount)}</strong></div>`).join(''):'<p class="muted">এখনো কোনো খরচ যোগ হয়নি।</p>';
+document.getElementById('depositValue').textContent=money(data.members[0]?.deposit||0);
+document.getElementById('myMealCount').textContent=['breakfast','lunch','dinner'].filter(mealOn).length;
+document.getElementById('accountExpenseTotal').textContent=money(data.expenses.reduce((s,e)=>s+e.amount,0));
+document.getElementById('adminMarketForm').classList.toggle('hidden',!isAdmin);
+document.getElementById('adminMemberForm').classList.toggle('hidden',!isAdmin);
+document.getElementById('roleSelect').value=data.role;document.getElementById('adminName').value=data.adminName||'বর্তমান Admin';
+document.getElementById('menuBreakfast').value=data.menu.breakfast;document.getElementById('menuLunch').value=data.menu.lunch;document.getElementById('menuDinner').value=data.menu.dinner;
+document.getElementById('deadlineBreakfast').value=data.deadlines.breakfast;document.getElementById('deadlineLunch').value=data.deadlines.lunch;document.getElementById('deadlineDinner').value=data.deadlines.dinner;
+const next=document.getElementById('nextAdmin');const old=next.value;next.innerHTML='<option value="">সদস্য নির্বাচন</option>'+data.members.map(m=>`<option>${esc(m.name)}</option>`).join('');next.value=data.nextAdmin||old;
+document.getElementById('membersList').innerHTML=data.members.map(m=>`<div class="item"><span>${esc(m.name)}</span><strong>${money(m.deposit)}</strong></div>`).join('');
+document.querySelector('nav button[data-page="admin"]').classList.toggle('hidden',!isAdmin);
+}
+function toggleMeal(id){if(deadlinePassed(id))return;data.meals[dayMealKey(id)]=!mealOn(id);save()}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+render();
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body></html>
